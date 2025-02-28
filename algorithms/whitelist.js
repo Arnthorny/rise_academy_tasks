@@ -8,8 +8,6 @@ const whitelistFileStr = fs.readFileSync(whitelistFile).toString();
 // Create set object from whitelist file
 const setWl = new Set(whitelistFileStr.split(" "));
 
-const setVal = new Set();
-
 // Create a readline interface
 const rl = readline.createInterface({
   input: process.stdin,
@@ -23,7 +21,6 @@ rl.on("line", (line) => {
 
   all_words.forEach((word) => {
     if (setWl.has(word)) {
-      setVal.add(word);
       process.stdout.write(`${word} `);
     }
   });
