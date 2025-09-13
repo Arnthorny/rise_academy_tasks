@@ -1,0 +1,46 @@
+services:
+  todowebapp:
+    build: ./src
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_URL: redis_db
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "webservice_db_postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_HOST: postgres_db
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+      redis_db:
+        condition: service_started
+
+  redis_db:
+    image: redis:8.0
+    restart: always
+    ports:
+      - "0:6379"
+    volumes:
+      - redis_data_todo:/data
+
+  postgres_db:
+    image: postgres:16
+    healthcheck:
+          test: ["CMD-SHELL", "pg_isready -h localhost -U postgres"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+    restart: always
+    ports:
+      - "0:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: webservice_db_postgres
+    volumes:
+      - postgres_data_todo:/var/lib/postgresql/data # For PostgresSQL <= 17
+
+
+volumes:
+  redis_data_todo:
+  postgres_data_todo:
